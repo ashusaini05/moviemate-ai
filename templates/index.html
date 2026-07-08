@@ -3,137 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Recommendation System</title>
+    <title>CinemaMatch - AI-Powered Movie Recommendation System</title>
+    <!-- Import Premium Typography from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0b0f19;
+            --container-bg: #111827;
+            --card-bg: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.4);
+            --accent-hover: #2563eb;
+            --border-color: #374151;
+            --font-display: 'Outfit', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
+
         header {
-            background-color: #2c3e50;
-            color: #ecf0f1;
+            background-color: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
             width: 100%;
-            padding: 20px 0;
+            padding: 25px 0;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
+
+        header h1 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            margin: 6px 0 0 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
         .container {
-            width: 80%;
-            max-width: 800px;
-            margin-top: 40px;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 850px;
+            margin: 40px 0;
+            background-color: var(--container-bg);
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            box-sizing: border-box;
         }
+
         h2 {
-            color: #34495e;
-            margin-bottom: 20px;
+            font-family: var(--font-display);
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+            font-weight: 600;
             text-align: center;
         }
+
         .search-box {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 15px;
         }
+
         input[type="text"] {
             flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #bdc3c7;
-            border-radius: 5px;
+            padding: 14px 20px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             font-size: 16px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s;
         }
+
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
         button {
-            padding: 12px 25px;
-            background-color: #3498db;
+            padding: 14px 30px;
+            background-color: var(--accent);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
+
         button:hover {
-            background-color: #2980b9;
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
+
         .error {
-            color: #e74c3c;
-            background: #fadbd8;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
             padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
             text-align: center;
+            font-weight: 500;
         }
+
         .suggestions {
-            margin-bottom: 30px;
-            color: #7f8c8d;
+            margin-bottom: 35px;
+            color: var(--text-secondary);
             font-size: 14px;
             text-align: center;
+            line-height: 1.8;
         }
+
         .suggestion-chip {
             display: inline-block;
-            background: #ecf0f1;
-            padding: 6px 12px;
-            border-radius: 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
             margin: 5px;
             cursor: pointer;
-            color: #2c3e50;
-            transition: background 0.2s;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.2s;
         }
+
         .suggestion-chip:hover {
-            background: #bdc3c7;
+            background: var(--border-color);
+            border-color: #4b5563;
+            transform: scale(1.05);
         }
+
+        .results-title {
+            margin-top: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            font-weight: 600;
+        }
+
+        .movie-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .movie-card {
-            background: #fdfdfd;
-            border-left: 5px solid #3498db;
-            padding: 15px 20px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
+            display: flex;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .movie-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            border-color: #4b5563;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
-        .movie-card h3 {
-            margin: 0 0 8px 0;
-            color: #2c3e50;
+
+        .poster-container {
+            width: 150px;
+            min-width: 150px;
+            height: 225px;
+            background-color: #111827;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border-right: 1px solid var(--border-color);
         }
-        .movie-card .genre {
-            font-size: 12px;
-            background: #e74c3c;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 3px;
-            display: inline-block;
-            margin-bottom: 10px;
-            font-weight: bold;
+
+        .movie-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
-        .movie-card p {
+
+        .poster-loader {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .movie-info {
+            padding: 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .movie-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .movie-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
             margin: 0;
-            color: #7f8c8d;
-            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .movie-rating {
+            font-weight: 700;
+            color: #fbbf24;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .movie-metadata {
+            margin: 8px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .genre {
+            font-size: 11px;
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .year {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .movie-credits {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 10px 0 0 0;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.4;
+        }
+
+        .movie-description {
+            margin: 10px 0 0 0;
+            color: var(--text-secondary);
+            font-size: 14.5px;
             line-height: 1.6;
         }
-        .results-title {
-            margin-top: 30px;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
+
         .footer {
-            margin-top: 40px;
-            padding: 20px;
-            color: #bdc3c7;
+            margin-top: auto;
+            padding: 25px 0;
+            color: var(--text-muted);
             font-size: 13px;
             text-align: center;
+            width: 100%;
+            background-color: var(--container-bg);
+            border-top: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        /* Responsive design for tablets and mobile */
+        @media (max-width: 600px) {
+            .movie-card {
+                flex-direction: column;
+            }
+            .poster-container {
+                width: 100%;
+                height: 250px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .search-box {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -141,7 +348,7 @@
 
 <header>
     <h1>🎬 CinemaMatch</h1>
-    <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.8;">Simple & Fast Movie Recommendations</p>
+    <p>AI-Powered Movie Recommendations &bull; 10,000+ Movies</p>
 </header>
 
 <div class="container">
@@ -149,14 +356,19 @@
     
     <form method="POST" action="/">
         <div class="search-box">
-            <input type="text" id="movie_name" name="movie_name" placeholder="Enter a movie name (e.g. Inception)" value="{{ searched_movie }}" required autocomplete="off">
+            <input type="text" id="movie_name" name="movie_name" list="movies_list" placeholder="Enter a movie name (e.g. Creed III)" value="{{ searched_movie }}" required autocomplete="off">
+            <datalist id="movies_list">
+                {% for m in all_movies %}
+                    <option value="{{ m }}"></option>
+                {% endfor %}
+            </datalist>
             <button type="submit">Search</button>
         </div>
     </form>
 
     <div class="suggestions">
-        <strong>Try:</strong>
-        {% for m in all_movies[:7] %}
+        <strong>Try:</strong><br>
+        {% for m in suggestion_chips %}
             <span class="suggestion-chip" onclick="document.getElementById('movie_name').value='{{ m }}'; document.forms[0].submit();">{{ m }}</span>
         {% endfor %}
     </div>
@@ -168,22 +380,251 @@
     {% endif %}
 
     {% if actual_title and recommendations %}
-        <h3 class="results-title">Because you liked <span style="color:#e74c3c;">{{ actual_title }}</span>, we recommend:</h3>
+        <h3 class="results-title">Because you liked <span style="color:#60a5fa;">{{ actual_title }}</span>, we recommend:</h3>
         
-        {% for movie in recommendations %}
-            <div class="movie-card">
-                <h3>{{ movie.title }}</h3>
-                <div class="genre">{{ movie.genre }}</div>
-                <p>{{ movie.description }}</p>
-            </div>
-        {% endfor %}
+        <div class="movie-list">
+            {% for movie in recommendations %}
+                <div class="movie-card">
+                    <div class="poster-container">
+                        <div class="poster-loader" id="loader-{{ loop.index }}"></div>
+                        <img class="movie-poster" 
+                             id="poster-{{ loop.index }}"
+                             data-title="{{ movie.title }}" 
+                             data-year="{{ movie.year }}"
+                             src="" 
+                             alt="{{ movie.title }} Poster"
+                             onload="document.getElementById('loader-{{ loop.index }}').style.display='none'; this.style.opacity='1';">
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-header">
+                            <h3 class="movie-title">{{ movie.title }}</h3>
+                            <span class="movie-rating">★ {{ movie.rating }}</span>
+                        </div>
+                        <div class="movie-metadata">
+                            <span class="genre">{{ movie.genre }}</span>
+                            {% if movie.year and movie.year != 'N/A' %}
+                                <span class="year">({{ movie.year }})</span>
+                            {% endif %}
+                        </div>
+                        <p class="movie-description">{{ movie.description }}</p>
+                        {% if movie.actors %}
+                            <div class="movie-credits">
+                                <strong>Cast:</strong> {{ movie.actors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <h3 class="results-title">Explore Popular Movies</h3>
+        
+        <div class="movie-list">
+            {% for movie in popular_movies %}
+                <div class="movie-card" style="cursor: pointer;" onclick="document.getElementById('movie_name').value='{{ movie.title }}'; document.forms[0].submit();">
+                    <div class="poster-container">
+                        <div class="poster-loader" id="loader-pop-{{ loop.index }}"></div>
+                        <img class="movie-poster" 
+                             id="poster-pop-{{ loop.index }}"
+                             data-title="{{ movie.title }}" 
+                             data-year="{{ movie.year }}"
+                             src="" 
+                             alt="{{ movie.title }} Poster"
+                             onload="document.getElementById('loader-pop-{{ loop.index }}').style.display='none'; this.style.opacity='1';">
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-header">
+                            <h3 class="movie-title">{{ movie.title }}</h3>
+                            <span class="movie-rating">★ {{ movie.rating }}</span>
+                        </div>
+                        <div class="movie-metadata">
+                            <span class="genre">{{ movie.genre }}</span>
+                            {% if movie.year and movie.year != 'N/A' %}
+                                <span class="year">({{ movie.year }})</span>
+                            {% endif %}
+                        </div>
+                        <p class="movie-description">{{ movie.description }}</p>
+                        {% if movie.actors %}
+                            <div class="movie-credits">
+                                <strong>Cast:</strong> {{ movie.actors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     {% endif %}
 
 </div>
 
 <div class="footer">
-    No Database &bull; Powered by Scikit-Learn TF-IDF &bull; Flask Based
+    No Database &bull; Powered by Scikit-Learn TF-IDF (On-the-Fly) &bull; Flask Based
 </div>
+
+<script>
+    // Asynchronously fetch movie posters from Wikipedia API
+    async function getMoviePoster(title, year) {
+        const cleanTitle = title.trim();
+        const placeholder = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300&auto=format&fit=crop&q=60";
+        
+        async function getImageUrl(fileTitle) {
+            try {
+                const url = `https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(fileTitle)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                const pages = data.query.pages;
+                const pageId = Object.keys(pages)[0];
+                if (pageId !== "-1" && pages[pageId].imageinfo && pages[pageId].imageinfo.length > 0) {
+                    return pages[pageId].imageinfo[0].url;
+                }
+            } catch (e) {
+                console.error("Error fetching imageinfo", e);
+            }
+            return null;
+        }
+
+        function findBestImage(images) {
+            if (!images) return null;
+            
+            // 1. Prioritize files containing "poster" (usually the official theatrical poster)
+            for (let img of images) {
+                const lower = img.title.toLowerCase();
+                if (lower.includes("poster") && (lower.endsWith(".jpg") || lower.endsWith(".png") || lower.endsWith(".jpeg"))) {
+                    return img.title;
+                }
+            }
+            
+            // 2. Fallback to files containing "cover"
+            for (let img of images) {
+                const lower = img.title.toLowerCase();
+                if (lower.includes("cover") && (lower.endsWith(".jpg") || lower.endsWith(".png") || lower.endsWith(".jpeg"))) {
+                    return img.title;
+                }
+            }
+
+            // 3. Fallback to first JPG/PNG that is not a logo, icon, or wiki graphic
+            for (let img of images) {
+                const lower = img.title.toLowerCase();
+                if ((lower.endsWith(".jpg") || lower.endsWith(".png") || lower.endsWith(".jpeg")) &&
+                    !lower.includes("logo") && !lower.includes("icon") && !lower.includes("stub") && !lower.includes("arrow")) {
+                    return img.title;
+                }
+            }
+            
+            return null;
+        }
+
+        // Step 1: Try OMDb API first (extremely fast and has exact IMDb posters for all movies)
+        try {
+            let omdbUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanTitle)}&apikey=trilogy`;
+            if (year && year !== 'N/A' && year.trim() !== '') {
+                omdbUrl += `&y=${encodeURIComponent(year)}`;
+            }
+            const omdbRes = await fetch(omdbUrl);
+            const omdbData = await omdbRes.json();
+            if (omdbData.Response === "True" && omdbData.Poster && omdbData.Poster !== "N/A") {
+                return omdbData.Poster;
+            }
+        } catch (e) {
+            console.warn("OMDb fetch failed, falling back to Wikipedia search", e);
+        }
+
+        // Step 2: Wikipedia Search fallback
+        try {
+            // Step 1: Use Search API with title, year, and "film" keyword (extremely accurate)
+            let searchTerms = cleanTitle;
+            if (year && year !== 'N/A' && year.trim() !== '') {
+                searchTerms += ` ${year}`;
+            }
+            searchTerms += " film";
+            
+            let searchUrl = `https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&list=search&srsearch=${encodeURIComponent(searchTerms)}`;
+            let searchRes = await fetch(searchUrl);
+            let searchData = await searchRes.json();
+            
+            let bestPageTitle = "";
+            
+            function scoreMatch(resultTitle, targetTitle, filmYear) {
+                const resTitle = resultTitle.toLowerCase();
+                const target = targetTitle.toLowerCase();
+                let score = 0;
+                
+                if (resTitle === target) score += 100;
+                if (resTitle.startsWith(target)) score += 50;
+                if (resTitle.includes(target)) score += 30;
+                if (filmYear && filmYear !== 'N/A' && resTitle.includes(filmYear)) score += 20;
+                
+                const targetWords = target.split(/\s+/);
+                let matchedWords = 0;
+                for (let word of targetWords) {
+                    if (word.length > 2 && resTitle.includes(word)) {
+                        matchedWords++;
+                    }
+                }
+                score += matchedWords * 5;
+                return score;
+            }
+
+            if (searchData.query.search && searchData.query.search.length > 0) {
+                let highestScore = -1;
+                for (let result of searchData.query.search) {
+                    const score = scoreMatch(result.title, cleanTitle, year);
+                    if (score > highestScore) {
+                        highestScore = score;
+                        bestPageTitle = result.title;
+                    }
+                }
+            } else {
+                // Fallback search with just "movie"
+                let fallbackSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&list=search&srsearch=${encodeURIComponent(cleanTitle + " movie")}`;
+                let fallbackRes = await fetch(fallbackSearchUrl);
+                let fallbackData = await fallbackRes.json();
+                if (fallbackData.query.search && fallbackData.query.search.length > 0) {
+                    let highestScore = -1;
+                    for (let result of fallbackData.query.search) {
+                        const score = scoreMatch(result.title, cleanTitle, year);
+                        if (score > highestScore) {
+                            highestScore = score;
+                            bestPageTitle = result.title;
+                        }
+                    }
+                }
+            }
+
+            // If we found a valid Wikipedia page title, get its images
+            if (bestPageTitle) {
+                let imagesUrl = `https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&prop=images&imlimit=100&titles=${encodeURIComponent(bestPageTitle)}&redirects=1`;
+                let imagesRes = await fetch(imagesUrl);
+                let imagesData = await imagesRes.json();
+                let pages = imagesData.query.pages;
+                let pageId = Object.keys(pages)[0];
+                
+                if (pageId !== "-1" && pages[pageId].images) {
+                    const bestImage = findBestImage(pages[pageId].images);
+                    if (bestImage) {
+                        const imgUrl = await getImageUrl(bestImage);
+                        if (imgUrl) return imgUrl;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error loading poster for: " + title, e);
+        }
+        
+        return placeholder;
+    }
+
+    // Load posters when the page is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+        const posters = document.querySelectorAll(".movie-poster");
+        posters.forEach(async (img) => {
+            const title = img.getAttribute("data-title");
+            const year = img.getAttribute("data-year");
+            const posterUrl = await getMoviePoster(title, year);
+            img.src = posterUrl;
+        });
+    });
+</script>
 
 </body>
 </html>

@@ -3,55 +3,83 @@ from markupsafe import escape
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import re
+import csv
+import os
+import random
 
 app = Flask(__name__)
 
-# Hardcoded curated movie dataset as requested
-MOVIES = [
-    {"id": 1, "title": "The Matrix", "description": "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.", "genre": "Action Sci-Fi"},
-    {"id": 2, "title": "Inception", "description": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.", "genre": "Action Sci-Fi Thriller"},
-    {"id": 3, "title": "Interstellar", "description": "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.", "genre": "Adventure Drama Sci-Fi"},
-    {"id": 4, "title": "Dumb and Dumber", "description": "After a woman leaves a briefcase at the airport terminal, a dumb limo driver and his dumber friend set out on a hilarious cross-country road trip.", "genre": "Comedy"},
-    {"id": 5, "title": "The Hangover", "description": "Three buddies wake up from a bachelor party in Las Vegas, with no memory of the previous night.", "genre": "Comedy"},
-    {"id": 6, "title": "The Dark Knight", "description": "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept physical tests of his ability to fight injustice.", "genre": "Action Crime Drama"},
-    {"id": 7, "title": "Avengers: Endgame", "description": "After the devastating events of Infinity War, the Avengers assemble once more in order to reverse Thanos' actions.", "genre": "Action Adventure Sci-Fi"},
-    {"id": 8, "title": "Titanic", "description": "A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.", "genre": "Drama Romance"},
-    {"id": 9, "title": "The Notebook", "description": "A poor yet passionate young man falls in love with a rich young woman, giving her a sense of freedom.", "genre": "Drama Romance"},
-    {"id": 10, "title": "Gladiator", "description": "A former Roman General sets out to exact vengeance against the corrupt emperor who murdered his family.", "genre": "Action Adventure Drama"},
-    {"id": 11, "title": "The Shawshank Redemption", "description": "Two imprisoned men bond over a number of years, finding solace and eventual redemption.", "genre": "Drama"},
-    {"id": 12, "title": "Superbad", "description": "Two co-dependent high school seniors are forced to deal with separation anxiety after their plan goes awry.", "genre": "Comedy"},
-    {"id": 13, "title": "Iron Man", "description": "After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor.", "genre": "Action Adventure Sci-Fi"},
-    {"id": 14, "title": "Joker", "description": "In Gotham City, mentally troubled comedian Arthur Fleck is disregarded by society. He embarks on a downward spiral of revolution.", "genre": "Crime Drama Thriller"},
-    {"id": 15, "title": "Spider-Man: No Way Home", "description": "With Spider-Man's identity now revealed, Peter asks Doctor Strange for help. When a spell goes wrong, foes appear.", "genre": "Action Adventure Sci-Fi"}
-]
+MOVIES = []
+csv_path = 'imdb_movies.csv'
 
-# Get a list of all titles to show as chips on UI
+# Load the dataset dynamically from imdb_movies.csv
+if os.path.exists(csv_path):
+    try:
+        with open(csv_path, mode='r', encoding='utf-8', errors='replace') as f:
+            reader = csv.DictReader(f)
+            for idx, row in enumerate(reader):
+                # Extract year from date_x (format: MM/DD/YYYY)
+                date_str = row.get("date_x", "").strip()
+                year_match = re.search(r'\d{4}', date_str)
+                year = year_match.group(0) if year_match else "N/A"
+                
+                # Convert 100-point score to 10-point rating
+                score_str = row.get("score", "").strip()
+                try:
+                    rating = f"{float(score_str) / 10:.1f}" if score_str else "N/A"
+                except ValueError:
+                    rating = "N/A"
+
+                # Truncate the cast list for clean UI presentation
+                crew_raw = row.get("crew", "").strip()
+                crew_list = [c.strip() for c in crew_raw.split(",") if c.strip()]
+                actors_clean = ", ".join(crew_list[:6])
+
+                MOVIES.append({
+                    "id": idx + 1,
+                    "title": row.get("names", "").strip(),
+                    "genre": row.get("genre", "").strip(),
+                    "description": row.get("overview", "").strip(),
+                    "rating": rating,
+                    "year": year,
+                    "actors": actors_clean
+                })
+        print(f"Successfully loaded {len(MOVIES)} movies from '{csv_path}'.")
+    except Exception as e:
+        print(f"Error loading CSV file: {e}")
+else:
+    print(f"Critical Error: '{csv_path}' file not found.")
+
+# Get list of all titles for autocomplete dropdown
 all_movie_titles = [m['title'] for m in MOVIES]
 
 def clean_text(text):
-    """
+    r"""
     Cleans text by removing digits and converting to lowercase.
     Using raw string r'\d' to fix the regex warning.
     """
     cleaned = re.sub(r'\d+', '', text)
     return cleaned.lower()
 
-# Combine 'genre' and 'description' to create feature vectors
-combined_features = [clean_text(m['genre'] + " " + m['description']) for m in MOVIES]
+# Combine features (genre + description + actors) for content-based vectorization
+combined_features = []
+for m in MOVIES:
+    feature_text = f"{m.get('genre', '')} {m.get('description', '')} {m.get('actors', '')}"
+    combined_features.append(clean_text(feature_text))
 
-# Initialize TF-IDF Vectorizer and calculate the similarity matrix
+# Initialize TF-IDF Vectorizer and compute sparse matrix (computed once on startup)
 tfidf = TfidfVectorizer(stop_words='english')
 tfidf_matrix = tfidf.fit_transform(combined_features)
-cosine_sim_matrix = cosine_similarity(tfidf_matrix)
 
 def get_recommendations(movie_title, max_results=5):
     """
     Given a movie title, returns the actual matched title and 
     a list of top 'max_results' recommended movies.
+    Optimized: Computes similarity dynamically on-the-fly to save ~800MB of RAM.
     """
     movie_title_lower = movie_title.strip().lower()
     
-    # 1. First, try an exact case-insensitive match
+    # 1. Search for movie (exact match first)
     movie_idx = -1
     actual_title = ""
     for i, m in enumerate(MOVIES):
@@ -60,7 +88,7 @@ def get_recommendations(movie_title, max_results=5):
             actual_title = m['title']
             break
             
-    # 2. If no exact match, try a partial match
+    # 2. Search for movie (partial match fallback)
     if movie_idx == -1:
         for i, m in enumerate(MOVIES):
             if movie_title_lower in m['title'].lower():
@@ -68,17 +96,19 @@ def get_recommendations(movie_title, max_results=5):
                 actual_title = m['title']
                 break
 
-    # If still not found, return an error message
     if movie_idx == -1:
         return None, "Movie not found in our database. Please try another one."
 
-    # 3. Get similarity scores for this movie based on its index
-    sim_scores = list(enumerate(cosine_sim_matrix[movie_idx]))
+    # 3. Optimization: Compute cosine similarity on-the-fly ONLY for the selected movie vector.
+    # This prevents storing a massive N x N dense similarity matrix in memory.
+    query_vector = tfidf_matrix[movie_idx]
+    sim_scores = cosine_similarity(query_vector, tfidf_matrix).flatten()
     
-    # 4. Sort the movies based on similarity scores (highest first)
+    # 4. Pair index with score and sort by similarity score (highest first)
+    sim_scores = list(enumerate(sim_scores))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     
-    # 5. Extract the best matches (skip index 0 as it is the movie itself)
+    # 5. Get top matches (ignoring index 0 since it is the movie itself)
     best_matches = sim_scores[1:max_results+1]
     
     # 6. Retrieve movie objects
@@ -94,7 +124,7 @@ def home():
     actual_title = ""
     
     if request.method == 'POST':
-        # Retrieve and escape input to prevent XSS (using markupsafe fixed import)
+        # Retrieve and escape input to prevent XSS
         raw_movie_name = request.form.get('movie_name', '')
         searched_movie = escape(raw_movie_name.strip())
         
@@ -102,20 +132,26 @@ def home():
             result_title, result = get_recommendations(str(searched_movie))
             
             if isinstance(result, str):
-                # Result is an error string
                 error = result
             else:
-                # Success
                 actual_title = result_title
                 recommendations = result
+
+    # Display 7 random movie suggestion chips to make the UI dynamic
+    suggestion_chips = random.sample(all_movie_titles, min(len(all_movie_titles), 7)) if all_movie_titles else []
+
+    # Sample 8 full movie dictionaries for the home page gallery grid
+    popular_movies = random.sample(MOVIES, min(len(MOVIES), 8)) if MOVIES else []
 
     return render_template('index.html', 
                            recommendations=recommendations, 
                            error=error, 
                            searched_movie=searched_movie,
                            actual_title=actual_title,
-                           all_movies=all_movie_titles)
+                           all_movies=all_movie_titles,
+                           suggestion_chips=suggestion_chips,
+                           popular_movies=popular_movies)
 
 if __name__ == '__main__':
-    # Run the Flask app
-    app.run(debug=True)
+    # Run the Flask app on port 5001 to avoid conflicts
+    app.run(debug=True, port=5001)
