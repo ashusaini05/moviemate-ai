@@ -58,11 +58,11 @@ combined_features = [f"{m['genre']} {m['description']} {m['actors']}".lower() fo
 tfidf = TfidfVectorizer(stop_words='english')
 tfidf_matrix = tfidf.fit_transform(combined_features)
 
-def get_recommendations(movie_title, max_results=5):
+def get_recommendations(movie_title, genre_filter="", sort_by="similarity", max_results=5):
     """
     Given a movie title, returns the actual matched title and 
     a list of top 'max_results' recommended movies.
-    Optimized: Computes similarity dynamically on-the-fly to save ~800MB of RAM.
+    Supports filtering by genre and sorting by rating/similarity.
     """
     movie_title_lower = movie_title.strip().lower()
     
@@ -81,10 +81,38 @@ def get_recommendations(movie_title, max_results=5):
     query_vector = tfidf_matrix[movie_idx]
     sim_scores = cosine_similarity(query_vector, tfidf_matrix).flatten()
     
-    # Get top matches (ignoring index 0 since it is the movie itself)
-    best_matches = sorted(list(enumerate(sim_scores)), key=lambda x: x[1], reverse=True)[1:max_results+1]
+    # Pair indices with similarity score
+    indexed_scores = list(enumerate(sim_scores))
+    
+    # Filter by genre if requested
+    if genre_filter:
+        genre_filter_lower = genre_filter.strip().lower()
+        indexed_scores = [
+            (idx, score) for idx, score in indexed_scores 
+            if idx == movie_idx or genre_filter_lower in MOVIES[idx]['genre'].lower()
+        ]
+
+    # Sort results
+    if sort_by == "rating":
+        def get_rating_val(idx):
+            try:
+                return float(MOVIES[idx]['rating'])
+            except ValueError:
+                return 0.0
+        indexed_scores = sorted(indexed_scores, key=lambda x: (get_rating_val(x[0]), x[1]), reverse=True)
+    else:
+        indexed_scores = sorted(indexed_scores, key=lambda x: x[1], reverse=True)
+
+    # Get top matches (ignoring the movie itself)
+    best_matches = []
+    for idx, score in indexed_scores:
+        if idx == movie_idx:
+            continue
+        best_matches.append((idx, score))
+        if len(best_matches) >= max_results:
+            break
+            
     recommended_movies = [MOVIES[idx] for idx, score in best_matches]
-        
     return actual_title, recommended_movies
 
 @app.route('/', methods=['GET', 'POST'])
@@ -93,13 +121,33 @@ def home():
     error = None
     searched_movie = ""
     actual_title = ""
+    genre_filter = ""
+    sort_by = "similarity"
     
+    # Extract unique genres from all movies to populate the genre filter dropdown
+    genres_set = set()
+    for m in MOVIES:
+        for g in m['genre'].split(','):
+            g_clean = g.strip()
+            if g_clean:
+                genres_set.add(g_clean)
+    all_genres = sorted(list(genres_set))
+
     if request.method == 'POST':
-        raw_movie_name = request.form.get('movie_name', '')
-        searched_movie = escape(raw_movie_name.strip())
+        # If it is a "Surprise Me" action, pick a random movie title
+        if request.form.get('surprise_me') == 'true':
+            if all_movie_titles:
+                searched_movie = random.choice(all_movie_titles)
+        else:
+            raw_movie_name = request.form.get('movie_name', '')
+            searched_movie = raw_movie_name.strip()
+            
+        searched_movie = escape(searched_movie)
+        genre_filter = request.form.get('genre_filter', '').strip()
+        sort_by = request.form.get('sort_by', 'similarity').strip()
         
         if searched_movie:
-            result_title, result = get_recommendations(str(searched_movie))
+            result_title, result = get_recommendations(str(searched_movie), genre_filter, sort_by)
             if isinstance(result, str):
                 error = result
             else:
@@ -116,7 +164,10 @@ def home():
                            actual_title=actual_title,
                            all_movies=all_movie_titles,
                            suggestion_chips=suggestion_chips,
-                           popular_movies=popular_movies)
+                           popular_movies=popular_movies,
+                           all_genres=all_genres,
+                           selected_genre=genre_filter,
+                           selected_sort=sort_by)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

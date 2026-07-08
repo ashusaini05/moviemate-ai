@@ -32,7 +32,6 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
         }
 
@@ -42,17 +41,18 @@
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             width: 100%;
-            padding: 25px 0;
+            padding: 20px 0;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
         }
 
         header h1 {
             font-family: var(--font-display);
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 800;
             margin: 0;
             background: linear-gradient(135deg, #60a5fa, #3b82f6);
@@ -62,18 +62,30 @@
         }
 
         header p {
-            margin: 6px 0 0 0;
-            font-size: 0.95rem;
+            margin: 4px 0 0 0;
+            font-size: 0.9rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
+        /* 2-Column layout structure */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 30px;
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
+            flex: 1;
+        }
+
+        .main-content {
+            min-width: 0;
+        }
+
         .container {
-            width: 90%;
-            max-width: 850px;
-            margin: 40px 0;
             background-color: var(--container-bg);
-            padding: 35px;
+            padding: 30px;
             border-radius: 16px;
             border: 1px solid var(--border-color);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
@@ -84,16 +96,14 @@
             font-family: var(--font-display);
             color: var(--text-primary);
             margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 1.6rem;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
             font-weight: 600;
-            text-align: center;
         }
 
         .search-box {
             display: flex;
             gap: 12px;
-            margin-bottom: 15px;
         }
 
         input[type="text"] {
@@ -114,16 +124,17 @@
         }
 
         button {
-            padding: 14px 30px;
+            padding: 14px 25px;
             background-color: var(--accent);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            white-space: nowrap;
         }
 
         button:hover {
@@ -132,19 +143,84 @@
             box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
 
+        /* Advanced search options row */
+        .search-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .filter-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .action-group {
+            margin-left: auto;
+        }
+
+        .surprise-btn {
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            color: white;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .surprise-btn:hover {
+            background: linear-gradient(135deg, #c084fc, #60a5fa);
+            box-shadow: 0 6px 16px rgba(168, 85, 247, 0.35);
+            transform: translateY(-1px);
+        }
+
         .error {
             color: #ef4444;
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.2);
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 25px;
+            margin: 25px 0;
             text-align: center;
             font-weight: 500;
         }
 
         .suggestions {
-            margin-bottom: 35px;
+            margin-top: 15px;
+            margin-bottom: 25px;
             color: var(--text-secondary);
             font-size: 14px;
             text-align: center;
@@ -155,26 +231,27 @@
             display: inline-block;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
-            margin: 5px;
+            margin: 4px;
             cursor: pointer;
             color: var(--text-primary);
             font-weight: 500;
+            font-size: 13px;
             transition: all 0.2s;
         }
 
         .suggestion-chip:hover {
             background: var(--border-color);
             border-color: #4b5563;
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
 
         .results-title {
-            margin-top: 40px;
+            margin-top: 35px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
             color: var(--text-primary);
             font-family: var(--font-display);
             font-weight: 600;
@@ -235,6 +312,46 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* Bookmark Heart Button on Poster */
+        .watchlist-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            padding: 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .watchlist-btn:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.8);
+            border-color: #ef4444;
+        }
+
+        .heart-icon {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2.5px;
+            transition: all 0.2s ease;
+        }
+
+        .watchlist-btn.bookmarked .heart-icon {
+            fill: #ef4444;
+            stroke: #ef4444;
         }
 
         .movie-info {
@@ -312,9 +429,138 @@
             line-height: 1.6;
         }
 
+        /* Sidebar Panels style */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-card {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+        }
+
+        .sidebar-card h3 {
+            font-family: var(--font-display);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .no-data {
+            color: var(--text-muted);
+            font-size: 13.5px;
+            text-align: center;
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        /* Watchlist list items style */
+        .watchlist-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom Scrollbar for watchlist */
+        .watchlist-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .watchlist-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+        }
+        .watchlist-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .watchlist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .watchlist-item:hover {
+            border-color: #4b5563;
+        }
+
+        .watchlist-item-poster {
+            width: 40px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            background-color: #0b0f19;
+            flex-shrink: 0;
+        }
+
+        .watchlist-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .watchlist-item-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+
+        .watchlist-item-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 4px 0 0 0;
+        }
+
+        .watchlist-remove-btn {
+            background: none;
+            border: none;
+            box-shadow: none;
+            padding: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .watchlist-remove-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .history-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
         .footer {
             margin-top: auto;
-            padding: 25px 0;
+            padding: 20px 0;
             color: var(--text-muted);
             font-size: 13px;
             text-align: center;
@@ -325,6 +571,12 @@
         }
 
         /* Responsive design for tablets and mobile */
+        @media (max-width: 950px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 600px) {
             .movie-card {
                 flex-direction: column;
@@ -337,6 +589,17 @@
             }
             .search-box {
                 flex-direction: column;
+            }
+            .search-options {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-group {
+                margin-left: 0;
+                width: 100%;
+            }
+            .surprise-btn {
+                width: 100%;
             }
             button {
                 width: 100%;
@@ -351,110 +614,168 @@
     <p>AI-Powered Movie Recommendations &bull; 10,000+ Movies</p>
 </header>
 
-<div class="container">
-    <h2>Find Similar Movies</h2>
-    
-    <form method="POST" action="/">
-        <div class="search-box">
-            <input type="text" id="movie_name" name="movie_name" list="movies_list" placeholder="Enter a movie name (e.g. Creed III)" value="{{ searched_movie }}" required autocomplete="off">
-            <datalist id="movies_list">
-                {% for m in all_movies %}
-                    <option value="{{ m }}"></option>
+<div class="app-layout">
+    <!-- Main Recommendation Interface -->
+    <main class="main-content">
+        <div class="container">
+            <h2>Find Similar Movies</h2>
+            
+            <form method="POST" action="/">
+                <div class="search-box">
+                    <input type="text" id="movie_name" name="movie_name" list="movies_list" placeholder="Enter a movie name (e.g. Creed III)" value="{{ searched_movie }}" required autocomplete="off">
+                    <datalist id="movies_list">
+                        {% for m in all_movies %}
+                            <option value="{{ m }}"></option>
+                        {% endfor %}
+                    </datalist>
+                    <button type="submit">Search</button>
+                </div>
+
+                <div class="search-options">
+                    <div class="filter-group">
+                        <label for="genre_filter">Genre Filter:</label>
+                        <select name="genre_filter" id="genre_filter" onchange="this.form.submit()">
+                            <option value="">All Genres</option>
+                            {% for g in all_genres %}
+                                <option value="{{ g }}" {% if selected_genre == g %}selected{% endif %}>{{ g }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="sort_by">Sort by:</label>
+                        <select name="sort_by" id="sort_by" onchange="this.form.submit()">
+                            <option value="similarity" {% if selected_sort == 'similarity' %}selected{% endif %}>Similarity Score</option>
+                            <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>IMDb Rating</option>
+                        </select>
+                    </div>
+
+                    <div class="action-group">
+                        <input type="hidden" name="surprise_me" id="surprise_me" value="false">
+                        <button type="button" class="surprise-btn" onclick="triggerSurpriseMe()">✨ Surprise Me!</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="suggestions">
+                <strong>Suggestions:</strong>
+                {% for m in suggestion_chips %}
+                    <span class="suggestion-chip" onclick="document.getElementById('movie_name').value='{{ m }}'; document.forms[0].submit();">{{ m }}</span>
                 {% endfor %}
-            </datalist>
-            <button type="submit">Search</button>
-        </div>
-    </form>
+            </div>
 
-    <div class="suggestions">
-        <strong>Try:</strong><br>
-        {% for m in suggestion_chips %}
-            <span class="suggestion-chip" onclick="document.getElementById('movie_name').value='{{ m }}'; document.forms[0].submit();">{{ m }}</span>
-        {% endfor %}
-    </div>
-
-    {% if error %}
-        <div class="error">
-            <strong>Oops:</strong> {{ error }}
-        </div>
-    {% endif %}
-
-    {% if actual_title and recommendations %}
-        <h3 class="results-title">Because you liked <span style="color:#60a5fa;">{{ actual_title }}</span>, we recommend:</h3>
-        
-        <div class="movie-list">
-            {% for movie in recommendations %}
-                <div class="movie-card">
-                    <div class="poster-container">
-                        <div class="poster-loader" id="loader-{{ loop.index }}"></div>
-                        <img class="movie-poster" 
-                             id="poster-{{ loop.index }}"
-                             data-title="{{ movie.title }}" 
-                             data-year="{{ movie.year }}"
-                             src="" 
-                             alt="{{ movie.title }} Poster"
-                             onload="document.getElementById('loader-{{ loop.index }}').style.display='none'; this.style.opacity='1';">
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-header">
-                            <h3 class="movie-title">{{ movie.title }}</h3>
-                            <span class="movie-rating">★ {{ movie.rating }}</span>
-                        </div>
-                        <div class="movie-metadata">
-                            <span class="genre">{{ movie.genre }}</span>
-                            {% if movie.year and movie.year != 'N/A' %}
-                                <span class="year">({{ movie.year }})</span>
-                            {% endif %}
-                        </div>
-                        <p class="movie-description">{{ movie.description }}</p>
-                        {% if movie.actors %}
-                            <div class="movie-credits">
-                                <strong>Cast:</strong> {{ movie.actors }}
-                            </div>
-                        {% endif %}
-                    </div>
+            {% if error %}
+                <div class="error">
+                    <strong>Oops:</strong> {{ error }}
                 </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <h3 class="results-title">Explore Popular Movies</h3>
-        
-        <div class="movie-list">
-            {% for movie in popular_movies %}
-                <div class="movie-card" style="cursor: pointer;" onclick="document.getElementById('movie_name').value='{{ movie.title }}'; document.forms[0].submit();">
-                    <div class="poster-container">
-                        <div class="poster-loader" id="loader-pop-{{ loop.index }}"></div>
-                        <img class="movie-poster" 
-                             id="poster-pop-{{ loop.index }}"
-                             data-title="{{ movie.title }}" 
-                             data-year="{{ movie.year }}"
-                             src="" 
-                             alt="{{ movie.title }} Poster"
-                             onload="document.getElementById('loader-pop-{{ loop.index }}').style.display='none'; this.style.opacity='1';">
-                    </div>
-                    <div class="movie-info">
-                        <div class="movie-header">
-                            <h3 class="movie-title">{{ movie.title }}</h3>
-                            <span class="movie-rating">★ {{ movie.rating }}</span>
-                        </div>
-                        <div class="movie-metadata">
-                            <span class="genre">{{ movie.genre }}</span>
-                            {% if movie.year and movie.year != 'N/A' %}
-                                <span class="year">({{ movie.year }})</span>
-                            {% endif %}
-                        </div>
-                        <p class="movie-description">{{ movie.description }}</p>
-                        {% if movie.actors %}
-                            <div class="movie-credits">
-                                <strong>Cast:</strong> {{ movie.actors }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+            {% endif %}
 
+            {% if actual_title and recommendations %}
+                <h3 class="results-title">Because you liked <span style="color:#60a5fa;">{{ actual_title }}</span>, we recommend:</h3>
+                
+                <div class="movie-list">
+                    {% for movie in recommendations %}
+                        <div class="movie-card">
+                            <div class="poster-container">
+                                <button class="watchlist-btn" onclick="toggleWatchlist(event, '{{ movie.title }}', '{{ movie.year }}', '{{ movie.rating }}', '{{ movie.genre }}', '{{ movie.description }}', '{{ movie.actors }}')">
+                                    <svg class="heart-icon" viewBox="0 0 24 24">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </button>
+                                <div class="poster-loader" id="loader-{{ loop.index }}"></div>
+                                <img class="movie-poster" 
+                                     id="poster-{{ loop.index }}"
+                                     data-title="{{ movie.title }}" 
+                                     data-year="{{ movie.year }}"
+                                     src="" 
+                                     alt="{{ movie.title }} Poster"
+                                     onload="document.getElementById('loader-{{ loop.index }}').style.display='none'; this.style.opacity='1';">
+                            </div>
+                            <div class="movie-info">
+                                <div class="movie-header">
+                                    <h3 class="movie-title">{{ movie.title }}</h3>
+                                    <span class="movie-rating">★ {{ movie.rating }}</span>
+                                </div>
+                                <div class="movie-metadata">
+                                    <span class="genre">{{ movie.genre }}</span>
+                                    {% if movie.year and movie.year != 'N/A' %}
+                                        <span class="year">({{ movie.year }})</span>
+                                    {% endif %}
+                                </div>
+                                <p class="movie-description">{{ movie.description }}</p>
+                                {% if movie.actors %}
+                                    <div class="movie-credits">
+                                        <strong>Cast:</strong> {{ movie.actors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <h3 class="results-title">Explore Popular Movies</h3>
+                
+                <div class="movie-list">
+                    {% for movie in popular_movies %}
+                        <div class="movie-card" style="cursor: pointer;" onclick="document.getElementById('movie_name').value='{{ movie.title }}'; document.forms[0].submit();">
+                            <div class="poster-container">
+                                <button class="watchlist-btn" onclick="toggleWatchlist(event, '{{ movie.title }}', '{{ movie.year }}', '{{ movie.rating }}', '{{ movie.genre }}', '{{ movie.description }}', '{{ movie.actors }}')">
+                                    <svg class="heart-icon" viewBox="0 0 24 24">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </button>
+                                <div class="poster-loader" id="loader-pop-{{ loop.index }}"></div>
+                                <img class="movie-poster" 
+                                     id="poster-pop-{{ loop.index }}"
+                                     data-title="{{ movie.title }}" 
+                                     data-year="{{ movie.year }}"
+                                     src="" 
+                                     alt="{{ movie.title }} Poster"
+                                     onload="document.getElementById('loader-pop-{{ loop.index }}').style.display='none'; this.style.opacity='1';">
+                            </div>
+                            <div class="movie-info">
+                                <div class="movie-header">
+                                    <h3 class="movie-title">{{ movie.title }}</h3>
+                                    <span class="movie-rating">★ {{ movie.rating }}</span>
+                                </div>
+                                <div class="movie-metadata">
+                                    <span class="genre">{{ movie.genre }}</span>
+                                    {% if movie.year and movie.year != 'N/A' %}
+                                        <span class="year">({{ movie.year }})</span>
+                                    {% endif %}
+                                </div>
+                                <p class="movie-description">{{ movie.description }}</p>
+                                {% if movie.actors %}
+                                    <div class="movie-credits">
+                                        <strong>Cast:</strong> {{ movie.actors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Sidebar Dashboard Panels -->
+    <aside class="sidebar">
+        <!-- Search History Panel -->
+        <div class="sidebar-card">
+            <h3>🔍 Recent Searches</h3>
+            <div id="search-history-list" class="history-chips">
+                <span class="no-data">No recent searches</span>
+            </div>
+        </div>
+
+        <!-- Watchlist Panel -->
+        <div class="sidebar-card">
+            <h3>❤️ My Watchlist (<span id="watchlist-count">0</span>)</h3>
+            <div id="watchlist-list" class="watchlist-container">
+                <p class="no-data">Your watchlist is empty.<br>Click the heart on any movie card to add it here!</p>
+            </div>
+        </div>
+    </aside>
 </div>
 
 <div class="footer">
@@ -462,11 +783,27 @@
 </div>
 
 <script>
-    // Asynchronously fetch movie posters from Wikipedia API
+    // Asynchronously fetch movie posters from OMDb API with Wikipedia fallback
     async function getMoviePoster(title, year) {
         const cleanTitle = title.trim();
         const placeholder = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300&auto=format&fit=crop&q=60";
         
+        // Step 1: Try OMDb API first (extremely fast and has exact IMDb posters for all movies)
+        try {
+            let omdbUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanTitle)}&apikey=trilogy`;
+            if (year && year !== 'N/A' && year.trim() !== '') {
+                omdbUrl += `&y=${encodeURIComponent(year)}`;
+            }
+            const omdbRes = await fetch(omdbUrl);
+            const omdbData = await omdbRes.json();
+            if (omdbData.Response === "True" && omdbData.Poster && omdbData.Poster !== "N/A") {
+                return omdbData.Poster;
+            }
+        } catch (e) {
+            console.warn("OMDb fetch failed, falling back to Wikipedia search", e);
+        }
+
+        // Step 2: Wikipedia Search fallback
         async function getImageUrl(fileTitle) {
             try {
                 const url = `https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&prop=imageinfo&iiprop=url&titles=${encodeURIComponent(fileTitle)}`;
@@ -514,24 +851,7 @@
             return null;
         }
 
-        // Step 1: Try OMDb API first (extremely fast and has exact IMDb posters for all movies)
         try {
-            let omdbUrl = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanTitle)}&apikey=trilogy`;
-            if (year && year !== 'N/A' && year.trim() !== '') {
-                omdbUrl += `&y=${encodeURIComponent(year)}`;
-            }
-            const omdbRes = await fetch(omdbUrl);
-            const omdbData = await omdbRes.json();
-            if (omdbData.Response === "True" && omdbData.Poster && omdbData.Poster !== "N/A") {
-                return omdbData.Poster;
-            }
-        } catch (e) {
-            console.warn("OMDb fetch failed, falling back to Wikipedia search", e);
-        }
-
-        // Step 2: Wikipedia Search fallback
-        try {
-            // Step 1: Use Search API with title, year, and "film" keyword (extremely accurate)
             let searchTerms = cleanTitle;
             if (year && year !== 'N/A' && year.trim() !== '') {
                 searchTerms += ` ${year}`;
@@ -575,7 +895,6 @@
                     }
                 }
             } else {
-                // Fallback search with just "movie"
                 let fallbackSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&origin=*&format=json&list=search&srsearch=${encodeURIComponent(cleanTitle + " movie")}`;
                 let fallbackRes = await fetch(fallbackSearchUrl);
                 let fallbackData = await fallbackRes.json();
@@ -614,7 +933,140 @@
         return placeholder;
     }
 
-    // Load posters when the page is loaded
+    // Watchlist state management using LocalStorage
+    function getWatchlist() {
+        return JSON.parse(localStorage.getItem("watchlist")) || [];
+    }
+
+    function saveWatchlist(list) {
+        localStorage.setItem("watchlist", JSON.stringify(list));
+    }
+
+    function updateWatchlistUI() {
+        const list = getWatchlist();
+        const container = document.getElementById("watchlist-list");
+        const countSpan = document.getElementById("watchlist-count");
+        countSpan.textContent = list.length;
+
+        if (list.length === 0) {
+            container.innerHTML = `<p class="no-data">Your watchlist is empty.<br>Click the heart on any movie card to add it here!</p>`;
+            document.querySelectorAll(".watchlist-btn").forEach(btn => btn.classList.remove("bookmarked"));
+            return;
+        }
+
+        container.innerHTML = "";
+        list.forEach(movie => {
+            const item = document.createElement("div");
+            item.className = "watchlist-item";
+            item.innerHTML = `
+                <img class="watchlist-item-poster" id="watchlist-poster-${movie.id}" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100" alt="${movie.title} Poster">
+                <div class="watchlist-item-info">
+                    <p class="watchlist-item-title" title="${movie.title}">${movie.title}</p>
+                    <p class="watchlist-item-meta">${movie.year} &bull; ★ ${movie.rating}</p>
+                </div>
+                <button class="watchlist-remove-btn" onclick="removeFromWatchlist(event, '${movie.title.replace(/'/g, "\\'")}')" title="Remove from Watchlist">
+                    <svg style="width:16px;height:16px;fill:currentColor" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                    </svg>
+                </button>
+            `;
+            container.appendChild(item);
+
+            // Fetch poster for the watchlist item
+            getMoviePoster(movie.title, movie.year).then(url => {
+                const img = document.getElementById(`watchlist-poster-${movie.id}`);
+                if (img) img.src = url;
+            });
+        });
+
+        // Sync heart buttons on the main screen cards
+        const titlesInWatchlist = list.map(m => m.title.toLowerCase());
+        document.querySelectorAll(".movie-card").forEach(card => {
+            const titleElement = card.querySelector(".movie-title");
+            if (titleElement) {
+                const title = titleElement.textContent.trim();
+                const btn = card.querySelector(".watchlist-btn");
+                if (btn) {
+                    if (titlesInWatchlist.includes(title.toLowerCase())) {
+                        btn.classList.add("bookmarked");
+                    } else {
+                        btn.classList.remove("bookmarked");
+                    }
+                }
+            }
+        });
+    }
+
+    function toggleWatchlist(event, title, year, rating, genre, description, actors) {
+        event.stopPropagation(); // Prevent card clicks if in gallery
+        let list = getWatchlist();
+        const exists = list.some(m => m.title.toLowerCase() === title.toLowerCase());
+
+        if (exists) {
+            list = list.filter(m => m.title.toLowerCase() !== title.toLowerCase());
+        } else {
+            const id = Math.floor(Math.random() * 1000000);
+            list.push({ title, year, rating, genre, description, actors, id });
+        }
+
+        saveWatchlist(list);
+        updateWatchlistUI();
+    }
+
+    function removeFromWatchlist(event, title) {
+        if (event) event.stopPropagation();
+        let list = getWatchlist();
+        list = list.filter(m => m.title.toLowerCase() !== title.toLowerCase());
+        saveWatchlist(list);
+        updateWatchlistUI();
+    }
+
+    // Recent Searches state management using LocalStorage
+    function getSearchHistory() {
+        return JSON.parse(localStorage.getItem("search_history")) || [];
+    }
+
+    function saveSearchHistory(list) {
+        localStorage.setItem("search_history", JSON.stringify(list));
+    }
+
+    function addSearchToHistory(title) {
+        if (!title) return;
+        let list = getSearchHistory();
+        list = list.filter(t => t.toLowerCase() !== title.toLowerCase());
+        list.unshift(title);
+        if (list.length > 5) list.pop();
+        saveSearchHistory(list);
+    }
+
+    function updateSearchHistoryUI() {
+        const list = getSearchHistory();
+        const container = document.getElementById("search-history-list");
+
+        if (list.length === 0) {
+            container.innerHTML = `<span class="no-data">No recent searches</span>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        list.forEach(title => {
+            const chip = document.createElement("span");
+            chip.className = "suggestion-chip";
+            chip.textContent = title;
+            chip.onclick = () => {
+                document.getElementById('movie_name').value = title;
+                document.forms[0].submit();
+            };
+            container.appendChild(chip);
+        });
+    }
+
+    function triggerSurpriseMe() {
+        document.getElementById("surprise_me").value = "true";
+        document.forms[0].submit();
+    }
+
+    // Load posters and initialize lists on DOM load
     document.addEventListener("DOMContentLoaded", () => {
         const posters = document.querySelectorAll(".movie-poster");
         posters.forEach(async (img) => {
@@ -623,6 +1075,17 @@
             const posterUrl = await getMoviePoster(title, year);
             img.src = posterUrl;
         });
+
+        // Initialize lists
+        updateWatchlistUI();
+        
+        // Add search query to history if it yielded a result
+        const searchedMovie = "{{ searched_movie }}";
+        if (searchedMovie && searchedMovie.trim() !== "") {
+            addSearchToHistory(searchedMovie);
+        }
+        
+        updateSearchHistoryUI();
     });
 </script>
 
