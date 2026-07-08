@@ -16,9 +16,8 @@ csv_path = 'imdb_movies.csv'
 if os.path.exists(csv_path):
     try:
         with open(csv_path, mode='r', encoding='utf-8', errors='replace') as f:
-            reader = csv.DictReader(f)
-            for idx, row in enumerate(reader):
-                # Extract year from date_x (format: MM/DD/YYYY)
+            for idx, row in enumerate(csv.DictReader(f)):
+                # Extract year (format: MM/DD/YYYY)
                 date_str = row.get("date_x", "").strip()
                 year_match = re.search(r'\d{4}', date_str)
                 year = year_match.group(0) if year_match else "N/A"
@@ -44,28 +43,16 @@ if os.path.exists(csv_path):
                     "year": year,
                     "actors": actors_clean
                 })
-        print(f"Successfully loaded {len(MOVIES)} movies from '{csv_path}'.")
+        print(f"Successfully loaded {len(MOVIES)} movies.")
     except Exception as e:
         print(f"Error loading CSV file: {e}")
 else:
     print(f"Critical Error: '{csv_path}' file not found.")
 
-# Get list of all titles for autocomplete dropdown
 all_movie_titles = [m['title'] for m in MOVIES]
 
-def clean_text(text):
-    r"""
-    Cleans text by removing digits and converting to lowercase.
-    Using raw string r'\d' to fix the regex warning.
-    """
-    cleaned = re.sub(r'\d+', '', text)
-    return cleaned.lower()
-
 # Combine features (genre + description + actors) for content-based vectorization
-combined_features = []
-for m in MOVIES:
-    feature_text = f"{m.get('genre', '')} {m.get('description', '')} {m.get('actors', '')}"
-    combined_features.append(clean_text(feature_text))
+combined_features = [f"{m['genre']} {m['description']} {m['actors']}".lower() for m in MOVIES]
 
 # Initialize TF-IDF Vectorizer and compute sparse matrix (computed once on startup)
 tfidf = TfidfVectorizer(stop_words='english')
@@ -79,39 +66,23 @@ def get_recommendations(movie_title, max_results=5):
     """
     movie_title_lower = movie_title.strip().lower()
     
-    # 1. Search for movie (exact match first)
-    movie_idx = -1
-    actual_title = ""
-    for i, m in enumerate(MOVIES):
-        if m['title'].lower() == movie_title_lower:
-            movie_idx = i
-            actual_title = m['title']
-            break
-            
-    # 2. Search for movie (partial match fallback)
-    if movie_idx == -1:
-        for i, m in enumerate(MOVIES):
-            if movie_title_lower in m['title'].lower():
-                movie_idx = i
-                actual_title = m['title']
-                break
-
-    if movie_idx == -1:
+    # Match movie (exact match first, then partial match fallback)
+    matches = [i for i, m in enumerate(MOVIES) if m['title'].lower() == movie_title_lower]
+    if not matches:
+        matches = [i for i, m in enumerate(MOVIES) if movie_title_lower in m['title'].lower()]
+        
+    if not matches:
         return None, "Movie not found in our database. Please try another one."
+        
+    movie_idx = matches[0]
+    actual_title = MOVIES[movie_idx]['title']
 
-    # 3. Optimization: Compute cosine similarity on-the-fly ONLY for the selected movie vector.
-    # This prevents storing a massive N x N dense similarity matrix in memory.
+    # Compute cosine similarity on-the-fly ONLY for the selected movie vector.
     query_vector = tfidf_matrix[movie_idx]
     sim_scores = cosine_similarity(query_vector, tfidf_matrix).flatten()
     
-    # 4. Pair index with score and sort by similarity score (highest first)
-    sim_scores = list(enumerate(sim_scores))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    
-    # 5. Get top matches (ignoring index 0 since it is the movie itself)
-    best_matches = sim_scores[1:max_results+1]
-    
-    # 6. Retrieve movie objects
+    # Get top matches (ignoring index 0 since it is the movie itself)
+    best_matches = sorted(list(enumerate(sim_scores)), key=lambda x: x[1], reverse=True)[1:max_results+1]
     recommended_movies = [MOVIES[idx] for idx, score in best_matches]
         
     return actual_title, recommended_movies
@@ -124,23 +95,18 @@ def home():
     actual_title = ""
     
     if request.method == 'POST':
-        # Retrieve and escape input to prevent XSS
         raw_movie_name = request.form.get('movie_name', '')
         searched_movie = escape(raw_movie_name.strip())
         
         if searched_movie:
             result_title, result = get_recommendations(str(searched_movie))
-            
             if isinstance(result, str):
                 error = result
             else:
                 actual_title = result_title
                 recommendations = result
 
-    # Display 7 random movie suggestion chips to make the UI dynamic
     suggestion_chips = random.sample(all_movie_titles, min(len(all_movie_titles), 7)) if all_movie_titles else []
-
-    # Sample 8 full movie dictionaries for the home page gallery grid
     popular_movies = random.sample(MOVIES, min(len(MOVIES), 8)) if MOVIES else []
 
     return render_template('index.html', 
@@ -153,5 +119,4 @@ def home():
                            popular_movies=popular_movies)
 
 if __name__ == '__main__':
-    # Run the Flask app on port 5001 to avoid conflicts
     app.run(debug=True, port=5001)
